@@ -21,5 +21,7 @@ int main(int argc, char **argv)
 
     printf("%s\n", nameReturn);
 
+    addString(dH, "string");
+
     return(0); 
 } 

@@ -27,7 +27,7 @@ struct dataString {
  * Returns a pointer to a struct of type dataHeader. It must dynamically allocate
  * the structure and set the initial values of the variables.
  */
-struct dataHeader *buildHeader();
+struct dataHeader * buildHeader();
 
 /*
  * Allocates and sets the name string in a dataHeader structure.

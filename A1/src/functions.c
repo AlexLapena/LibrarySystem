@@ -10,7 +10,7 @@
 
 #include "functions.h"
 
-struct dataHeader *buildHeader() 
+struct dataHeader * buildHeader() 
 {
     struct dataHeader *head = (struct dataHeader *) malloc(sizeof(struct dataHeader));
     struct dataString *dS = (struct dataString *) malloc(sizeof(struct dataString));
@@ -37,12 +37,17 @@ char * getName(struct dataHeader *header)
 
 int getLength(struct dataHeader *header)
 {
-
+    return(header->length);
 }
 
 void addString(struct dataHeader *header, char *str)
 {
-
+    struct dataString *dS = (struct dataString *) malloc(sizeof(struct dataString));
+    if (dS->next == NULL) {
+        printf("good\n");
+        dS->string = NULL;
+        dS->next = NULL;
+    }
 }
 
 void printString(struct dataHeader *header)
