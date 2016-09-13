@@ -22,6 +22,10 @@ int main(int argc, char **argv)
     printf("%s\n", nameReturn);
 
     addString(dH, "string");
+    addString(dH, "another");
+    addString(dH, "Test");
+
+    printString(dH);
 
     return(0); 
 } 
