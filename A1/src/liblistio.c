@@ -3,12 +3,12 @@
  * 0844071
  * CIS* 2750 - A1
  *
- * functions.c
+ * liblistio.c
  * 
  * 12 September 2016
  */
 
-#include "functions.h"
+#include "listio.h"
 
 struct dataHeader * buildHeader() 
 {
@@ -47,7 +47,7 @@ void addString(struct dataHeader *header, char *str)
     dS->string = malloc(sizeof(char) * strlen(str));
     strcpy(dS->string, str);
 
-    // If first string
+    // First string 
     if (header->next == NULL) {
         header->next = dS;
         return;
@@ -58,7 +58,6 @@ void addString(struct dataHeader *header, char *str)
         current = current->next;
     }
     current->next = dS;
-    // FixMe
     dS->next = NULL;
 }
 
@@ -68,6 +67,7 @@ void printString(struct dataHeader *header)
 
     while (dS != NULL) {
         printf("%s\n", dS->string);
+        dS = dS->next;
     }
 }
 
@@ -78,15 +78,16 @@ void processStrings(struct dataHeader *header)
 
 void freeStructure(struct dataHeader *header)
 {
-    // Test & fix me
     struct dataString * current = header->next;
     struct dataString * next;
 
     while(current != NULL){
         next = current->next;
+        free(current->string);
         free(current);
         current = next;
     }
+    free(header->name);
     free(header);
     header = NULL;
 }
