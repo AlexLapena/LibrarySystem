@@ -7,4 +7,4 @@ ds: main.c src/liblistio.c
 	$(CC) main.c src/liblistio.c
 
 clean:
-	rm -rf *.o ds a.out
+	rm -rf *.o ds a.out test.bin
