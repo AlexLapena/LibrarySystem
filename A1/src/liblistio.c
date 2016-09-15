@@ -108,34 +108,65 @@ void freeStructure(struct dataHeader *header)
 
 void writeStrings(char *filename, struct dataHeader *header)
 {
-    // Test me
+    // fix length of string with null terminator *** strcat() \0
     struct dataString * dS = header->next;
     FILE *fp;
-    int nameLength, strLength;
+    int nameLength, strLength, totalLength;
+
+    // Calculate the length
+    while (dS != NULL) {
+        totalLength = strlen(dS->string) + totalLength;
+        dS = dS->next;
+    }
+    header->length = totalLength;
 
     fp = fopen(filename, "wb");
 
     nameLength = strlen(header->name);
-    fwrite(&nameLength, 1, sizeof(int), fp);
-    fwrite(header->name, 1, sizeof(header->name), fp);
-    fwrite(&header->length, 1, sizeof(int), fp);
+    fwrite(&nameLength, sizeof(int), 1, fp);
+    fwrite(header->name, sizeof(char), nameLength, fp);
+    fwrite(&header->length, sizeof(int), 1, fp);
+    dS = header->next;
 
     while (dS != NULL) {
         strLength = strlen(dS->string);
-        fwrite(&strLength, 1, sizeof(int), fp);
-        fwrite(dS->string, 1, sizeof(dS->string), fp);
+        fwrite(&strLength, sizeof(int), 1, fp);
+        fwrite(dS->string, sizeof(char), strLength, fp);
         dS = dS->next;
     }
     fclose(fp);
 }
 
+
 struct dataHeader *readStrings(char *filename)
 {
-    struct dataHeader *header;
-    struct
+    
+    struct dataHeader *header = buildHeader();
+    struct dataString *dS = header->next;
     FILE * fp;
+    int tempBuff, skip = 0;
+    char buffer[1024];
 
     fp = fopen(filename, "rb");
 
+    fread(&tempBuff, sizeof(int), 1, fp);
+    fread(buffer, sizeof(char), tempBuff, fp);
+    setName(header, buffer);
+
+    fread(&header->length, sizeof(int), 1, fp);
+
+    while (!feof(fp)) {
+        if (skip != 0) {
+            fread(buffer, sizeof(char), tempBuff, fp);
+            addString(header, buffer);
+            skip--;
+        }
+        fread(&tempBuff, sizeof(int), 1, fp);
+        skip++;
+    }
+
+
     fclose(fp);
+
+    return(header);
 }

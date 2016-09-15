@@ -17,6 +17,7 @@ int main(int argc, char **argv)
     struct dataString *dS;
     char *nameReturn;
 
+    /*
     dH = buildHeader();
     setName(dH, "This is the Name");
     nameReturn = getName(dH);
@@ -46,14 +47,18 @@ int main(int argc, char **argv)
     printf("\nfile io\n");
     dH = buildHeader();
     setName(dH, "name");
-    addString(dH, "file test");
-    addString(dH, "test 2.0");
+    addString(dH, "string");
+    addString(dH, "another");
+    addString(dH, "Test");
     writeStrings("test.bin", dH);
+    freeStructure(dH);
+    printf("\nFreed\n\n");*/
+
     read = readStrings("test.bin");
     printString(read);
 
 
-    freeStructure(dH);
+   
     freeStructure(read);
 
     return(0); 
