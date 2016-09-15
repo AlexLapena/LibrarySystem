@@ -145,18 +145,19 @@ struct dataHeader *readStrings(char *filename)
     struct dataString *dS = header->next;
     FILE * fp;
     int tempBuff, skip = 0;
-    char buffer[1024];
+    char * buffer;
 
     fp = fopen(filename, "rb");
 
     fread(&tempBuff, sizeof(int), 1, fp);
+    buffer = malloc(sizeof(char) * tempBuff);
     fread(buffer, sizeof(char), tempBuff, fp);
     setName(header, buffer);
-
     fread(&header->length, sizeof(int), 1, fp);
 
     while (!feof(fp)) {
         if (skip != 0) {
+            buffer = malloc(sizeof(char) * tempBuff);
             fread(buffer, sizeof(char), tempBuff, fp);
             addString(header, buffer);
             skip--;

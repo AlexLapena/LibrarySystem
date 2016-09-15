@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     processStrings(dH);
     freeStructure(dH);
 
-    printf("\nfile io\n");
+    printf("\nfile io\n");*/
     dH = buildHeader();
     setName(dH, "name");
     addString(dH, "string");
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     addString(dH, "Test");
     writeStrings("test.bin", dH);
     freeStructure(dH);
-    printf("\nFreed\n\n");*/
+    printf("\nFreed\n\n");
 
     read = readStrings("test.bin");
     printString(read);
