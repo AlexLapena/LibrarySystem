@@ -47,9 +47,10 @@ void addString(struct dataHeader *header, char *str)
     dS->string = malloc(sizeof(char) * strlen(str));
     strcpy(dS->string, str);
 
-    // First string 
+    // First string
     if (header->next == NULL) {
         header->next = dS;
+        dS->next = NULL;
         return;
     }
         
@@ -65,7 +66,7 @@ void printString(struct dataHeader *header)
 {
     struct dataString *dS = header->next;
 
-    printf("%s\n", header->name);
+    printf("%s\n", getName(header));
 
     while (dS != NULL) {
         printf("%s\n", dS->string);
@@ -76,17 +77,118 @@ void printString(struct dataHeader *header)
 void processStrings(struct dataHeader *header)
 {
     /* FIX ME */
-    struct dataString *dS = header->next;
-    int length = strlen(dS->string);
-    int i;
 
-    printf("%s\n",dS->string);
-    for (i = 0; i <= length; i++) {
-        if ((dS->string[i-1] == dS->string[i]) && (dS->string[i] == (char)32 || 
-                dS->string[i] == '\n')) {
-            
-            printf("got here %d\n", i);
+    struct dataString *dS = header->next;
+    struct dataString *current = header->next;
+    int length, i, j, k;
+    char * newString;
+
+    while (dS->next != NULL) {
+        length = strlen(dS->string);
+        // Traverse through each character string
+        for (i = 0; i < length; i++) {
+
+            // Processing carriage returns and new lines. Converts to HTML tags
+            if (dS->string[i] == '\r' || dS->string[i] == '\n') {
+
+                // check if <P>
+                if (dS->string[i-1] == '\r' || dS->string[i-1] == '\n' || dS->string[i+1] == '\n'
+                        || dS->string[i+1] == '\n') {
+
+                    if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n') {
+                        printf("<P>\n");   
+                         // malloc more space for the html tag
+                        for (j = 0; j < length; j++) {
+                            if (j == i) {
+                                strcat(newString, "<P>");
+                                k = k + 3;
+                            }
+                            else {
+                                newString[k] = dS->string[j];
+                            }
+                            k++;
+                        }
+                        addString(header, newString);
+                    }
+
+                    else {
+                        printf("%s\n", dS->string);
+                         // remove space
+                        for (j = 0; j < length; j++) {
+                            if (j == i) {
+                                continue;
+                            }
+                            else {
+                                newString[j] = dS->string[j];
+                            }
+                        }
+                        printf("%s\n", newString);
+                        addString(header, newString);
+                        printf("%s\n", dS->string);
+                        processStrings(header);
+                    }
+                }
+
+                // Check if <BR>
+                if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n' && dS->string[i-1] != '\n'
+                        && dS->string[i-1] != '\r') {
+                    // malloc more space for the html tag
+                    for (j = 0; j < length; j++) {
+                        if (j == i) {
+                            strcat(newString, "<BR>");
+                            k = k + 4;
+                        }
+                        else {
+                            newString[k] = dS->string[j];
+                        }
+                        k++;
+                    }
+                    addString(header, newString);
+                }
+            }
+
+            // Processes tabs. 
+            else if (dS->string[i] == '\t') {
+                if (dS->string[i-1] == '\t') {
+                    printf("%s\n", dS->string);
+                    // remove space
+                    for (j = 0; j < length; j++) {
+                        if (j == i) {
+                            continue;
+                        }
+                        else {
+                            newString[j] = dS->string[j];
+                        }
+                    }
+                    printf("%s\n", newString);
+                    addString(header, newString);
+                    printf("%s\n", dS->string);
+                    processStrings(header);
+                }
+            }
+
+            // Processes spaces
+            else if (dS->string[i] == ' ') {
+                if (dS->string[i-1] == ' ') {
+                    printf("%s\n", dS->string);
+                    // remove space
+                    for (j = 0; j < length; j++) {
+                        if (j == i) {
+                            continue;
+                        }
+                        else {
+                            printf("%c", dS->string[j]);
+                            newString[j] = dS->string[j];
+                        }
+                    }
+                    printf("\n%s\n", newString);
+                    addString(header, newString);
+                    printf("%s\n", dS->string);
+                    processStrings(header);
+                }
+            }
         }
+        dS = dS->next;
     }
 }
 
@@ -126,23 +228,24 @@ void writeStrings(char *filename, struct dataHeader *header)
     fwrite(&nameLength, sizeof(int), 1, fp);
     fwrite(header->name, sizeof(char), nameLength, fp);
     fwrite(&header->length, sizeof(int), 1, fp);
+    printf("%d\n%s\n%d\n", nameLength, header->name, header->length);
     dS = header->next;
 
     while (dS != NULL) {
         strLength = strlen(dS->string);
         fwrite(&strLength, sizeof(int), 1, fp);
         fwrite(dS->string, sizeof(char), strLength, fp);
+        printf("%d\n%s\n", strLength, dS->string);
         dS = dS->next;
     }
     fclose(fp);
 }
 
-
 struct dataHeader *readStrings(char *filename)
 {
     
     struct dataHeader *header = buildHeader();
-    struct dataString *dS = header->next;
+    struct dataString *dS;
     FILE * fp;
     int tempBuff, skip = 0;
     char * buffer;
@@ -162,10 +265,11 @@ struct dataHeader *readStrings(char *filename)
             addString(header, buffer);
             skip--;
         }
-        fread(&tempBuff, sizeof(int), 1, fp);
-        skip++;
+        else{
+            fread(&tempBuff, sizeof(int), 1, fp);
+            skip++;
+        }
     }
-
 
     fclose(fp);
 
