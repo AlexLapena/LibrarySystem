@@ -17,48 +17,28 @@ int main(int argc, char **argv)
     struct dataString *dS;
     char *nameReturn;
 
-    /*
     dH = buildHeader();
-    setName(dH, "This is the Name");
-    nameReturn = getName(dH);
-
-    printf("%s\n\n", nameReturn);
-
-    addString(dH, "string");
-    addString(dH, "another");
-    addString(dH, "Test");
-
+   // printf(" - Header Built\n");
+    setName(dH, "Name of Title");
+   // printf(" - Name Set\n");
+    addString(dH, "string\n\ntester");
+    addString(dH, "another fd");
+    addString(dH, "hey hi");
+    addString(dH, "This is a story");
+   // printf(" - Strings added\n");
     printString(dH);
 
-    printf("\n");
-    addString(dH, "HELLO it is me");
-    printString(dH);
-
-    freeStructure(dH);
-
-    printf("\nprocess string\n");
-    dH = buildHeader();
-    setName(dH, "name");
-    nameReturn = getName(dH);
-    addString(dH, "test\nend");
+    printf(" - Strings Processed\n");
     processStrings(dH);
-    freeStructure(dH);
 
-    printf("\nfile io\n");*/
-    dH = buildHeader();
-    setName(dH, "name");
-    addString(dH, "string");
-    addString(dH, "another");
-    addString(dH, "Test");
+    /*printf("\n** Expected **\n\n");
     writeStrings("test.bin", dH);
+    printf("\n - Strings written\n");
     freeStructure(dH);
-    printf("\nFreed\n\n");
-
+    printf(" - Structure freed\n");
     read = readStrings("test.bin");
-    printString(read);
-
-
-   
+    printf("\n** String reading **\n\n");
+    printString(read);*/
     freeStructure(read);
 
     return(0); 
