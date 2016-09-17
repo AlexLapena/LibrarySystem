@@ -80,7 +80,7 @@ void processStrings(struct dataHeader *header)
     int length, i, j, k;
     char * newString;
 
-    while (dS->next != NULL) {
+    while (dS != NULL) {
         length = strlen(dS->string);
         printf("STRING: %d %s\n", length, dS->string);
 
@@ -95,58 +95,81 @@ void processStrings(struct dataHeader *header)
                  */
                 if (dS->string[i-1] == '\r' || dS->string[i-1] == '\n' || dS->string[i+1] == '\n'
                         || dS->string[i+1] == '\n') {
-
-                    if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n') {
-                        printf("<P>\n");   
-                         // malloc more space for the html tag
-                        for (j = 0; j < length; j++) {
+                    printf("here 1\n");
+                    // If there are 2 left, remove last one for <p> tag
+                    if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n') { 
+                        printf("here 2\n");
+                        for (j = 0, k = 0; j < length; j++) {
                             if (j == i) {
-                                strcat(newString, "<P>");
+                                newString[k] = '<';
+                                printf("%c", newString[k]);
+                                newString[k+1] = 'P';
+                                printf("%c", newString[k+1]);
+                                newString[k+2] = '>';
+                                printf("%c", newString[k+2]);
                                 k = k + 3;
                             }
                             else {
                                 newString[k] = dS->string[j];
-                            }
-                            k++;
+                                printf("%c", newString[k]);
+                                k++;
+                            }                         
                         }
+                        printf("\n*: %s\n", newString);
                         dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                        printf("segfault\n");
                         strcpy(dS->string, newString);
                     }
 
+                    // Removes multiple newlines and carriage returns
                     else {
+                        printf("here 3\n");
                         printf("%s\n", dS->string);
-                         // remove space
-                        for (j = 0; j < length; j++) {
+                        for (j = 0, k = 0; j < length; j++) {
                             if (j == i) {
                                 continue;
                             }
                             else {
-                                newString[j] = dS->string[j];
-                            }
+                                newString[k] = dS->string[j];
+                                k++;
+                            }                        
                         }
+                        printf("\n*: %s\n", newString);
                         dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                        printf("segfault\n");
                         strcpy(dS->string, newString);
                         processStrings(header);
                     }
                 }
 
                 /*
-                 * <br> tag -> multiple tabs/ carraige returns
+                 * <br> tag -> 1 tab/ carraige return
                  */
-                if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n' && dS->string[i-1] != '\n'
-                        && dS->string[i-1] != '\r') {
+                else if ((dS->string[i+1] != '\r' && dS->string[i+1] != '\n') && (dS->string[i-1] != '\n'
+                        && dS->string[i-1] != '\r')) {
+                    printf("here 4\n");
                     // malloc more space for the html tag
-                    for (j = 0; j < length; j++) {
+                    for (j = 0, k = 0; j < length; j++) {
                         if (j == i) {
-                            strcat(newString, "<BR>");
+                            newString[k] = '<';
+                            printf("%c", newString[k]);
+                            newString[k+1] = 'B';
+                            printf("%c", newString[k+1]);
+                            newString[k+2] = 'R';
+                            printf("%c", newString[k+2]);
+                            newString[k+3] = '>';
+                            printf("%c", newString[k+3]);
                             k = k + 4;
                         }
                         else {
                             newString[k] = dS->string[j];
-                        }
-                        k++;
+                            printf("%c", newString[k]);
+                            k++;
+                        } 
                     }
+                    printf("\n*: %s\n", newString);
                     dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    printf("segfault\n");
                     strcpy(dS->string, newString);
                 }
             }
@@ -155,7 +178,7 @@ void processStrings(struct dataHeader *header)
             else if (dS->string[i] == '\t') {
                 if (dS->string[i+1] == '\t' || dS->string[i-1] == '\t') {
                     // remove tab
-                    for (j = 0; j < length; j++) {
+                    for (j = 0, k = 0; j < length; j++) {
                         if (j == i) {
                             continue;
                         }
@@ -164,7 +187,9 @@ void processStrings(struct dataHeader *header)
                             k++;
                         }
                     }
+                    printf("\n");
                     dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    printf("segfault\n");
                     strcpy(dS->string, newString);
                     processStrings(header);
                 }
@@ -183,9 +208,10 @@ void processStrings(struct dataHeader *header)
                             k++;
                         }
                     }
+                    printf("\n");
                     dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    printf("segfault\n");
                     strcpy(dS->string, newString);
-                    length = strlen(dS->string);
                     processStrings(header);
                 }
             }
@@ -196,6 +222,8 @@ void processStrings(struct dataHeader *header)
 
 void freeStructure(struct dataHeader *header)
 {
+    /* Change to free from back!!*/
+
     struct dataString * current = header->next;
     struct dataString * next;
 
