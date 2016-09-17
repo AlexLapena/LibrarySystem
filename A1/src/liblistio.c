@@ -76,22 +76,23 @@ void printString(struct dataHeader *header)
 
 void processStrings(struct dataHeader *header)
 {
-    /* FIX ME */
-
     struct dataString *dS = header->next;
-    struct dataString *current = header->next;
     int length, i, j, k;
     char * newString;
 
     while (dS->next != NULL) {
         length = strlen(dS->string);
+        printf("STRING: %d %s\n", length, dS->string);
+
         // Traverse through each character string
         for (i = 0; i < length; i++) {
 
             // Processing carriage returns and new lines. Converts to HTML tags
             if (dS->string[i] == '\r' || dS->string[i] == '\n') {
 
-                // check if <P>
+                /*
+                 * <p> tag -> multiple tabs/ carraige returns
+                 */
                 if (dS->string[i-1] == '\r' || dS->string[i-1] == '\n' || dS->string[i+1] == '\n'
                         || dS->string[i+1] == '\n') {
 
@@ -108,7 +109,8 @@ void processStrings(struct dataHeader *header)
                             }
                             k++;
                         }
-                        addString(header, newString);
+                        dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                        strcpy(dS->string, newString);
                     }
 
                     else {
@@ -122,14 +124,15 @@ void processStrings(struct dataHeader *header)
                                 newString[j] = dS->string[j];
                             }
                         }
-                        printf("%s\n", newString);
-                        addString(header, newString);
-                        printf("%s\n", dS->string);
+                        dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                        strcpy(dS->string, newString);
                         processStrings(header);
                     }
                 }
 
-                // Check if <BR>
+                /*
+                 * <br> tag -> multiple tabs/ carraige returns
+                 */
                 if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n' && dS->string[i-1] != '\n'
                         && dS->string[i-1] != '\r') {
                     // malloc more space for the html tag
@@ -143,47 +146,46 @@ void processStrings(struct dataHeader *header)
                         }
                         k++;
                     }
-                    addString(header, newString);
+                    dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    strcpy(dS->string, newString);
                 }
             }
 
             // Processes tabs. 
             else if (dS->string[i] == '\t') {
-                if (dS->string[i-1] == '\t') {
-                    printf("%s\n", dS->string);
-                    // remove space
+                if (dS->string[i+1] == '\t' || dS->string[i-1] == '\t') {
+                    // remove tab
                     for (j = 0; j < length; j++) {
                         if (j == i) {
                             continue;
                         }
                         else {
-                            newString[j] = dS->string[j];
+                            newString[k] = dS->string[j];
+                            k++;
                         }
                     }
-                    printf("%s\n", newString);
-                    addString(header, newString);
-                    printf("%s\n", dS->string);
+                    dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    strcpy(dS->string, newString);
                     processStrings(header);
                 }
             }
 
             // Processes spaces
             else if (dS->string[i] == ' ') {
-                if (dS->string[i-1] == ' ') {
-                    printf("%s\n", dS->string);
+                if (dS->string[i+1] == ' ' || dS->string[i-1] == ' ') {
                     // remove space
-                    for (j = 0; j < length; j++) {
+                    for (j = 0, k = 0; j < length; j++) {
                         if (j == i) {
                             continue;
                         }
                         else {
-                            printf("%c", dS->string[j]);
-                            newString[j] = dS->string[j];
+                            newString[k] = dS->string[j];
+                            k++;
                         }
                     }
-                    printf("\n%s\n", newString);
-                    addString(header, newString);
-                    printf("%s\n", dS->string);
+                    dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                    strcpy(dS->string, newString);
+                    length = strlen(dS->string);
                     processStrings(header);
                 }
             }
