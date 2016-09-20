@@ -66,6 +66,16 @@ void printString(struct dataHeader *header);
  */
 void processStrings(struct dataHeader *header);
 
+/*
+ * Associated with process strings
+ */
+char * spaceAdjust(char * string, int index);
+
+/*
+ * Associated with process strings
+ */
+char * newLineAdjust(char * string, int index);
+
 /* 
  * Free() all of the dataString structures and the dataHeader structure.
 */
