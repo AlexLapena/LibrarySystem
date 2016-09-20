@@ -21,7 +21,7 @@ int main(int argc, char **argv)
    // printf(" - Header Built\n");
     setName(dH, "Name of Title");
    // printf(" - Name Set\n");
-    addString(dH, "string\n\ntester");
+    //addString(dH, "string\ntester");
     addString(dH, "another fd");
     addString(dH, "hey hi");
     addString(dH, "This is a story");
@@ -31,14 +31,14 @@ int main(int argc, char **argv)
     printf(" - Strings Processed\n");
     processStrings(dH);
 
-    /*printf("\n** Expected **\n\n");
+    printf("\n** Expected **\n\n");
     writeStrings("test.bin", dH);
     printf("\n - Strings written\n");
     freeStructure(dH);
     printf(" - Structure freed\n");
     read = readStrings("test.bin");
     printf("\n** String reading **\n\n");
-    printString(read);*/
+    printString(read);
     freeStructure(read);
 
     return(0); 

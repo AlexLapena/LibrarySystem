@@ -95,10 +95,32 @@ void processStrings(struct dataHeader *header)
                  */
                 if (dS->string[i-1] == '\r' || dS->string[i-1] == '\n' || dS->string[i+1] == '\n'
                         || dS->string[i+1] == '\n') {
-                    printf("here 1\n");
+
+
+                    // Removes multiple newlines and carriage returns
+                    if ((dS->string[i+1] == '\n' || dS->string[i+1] == '\r') && (dS->string[i+2] == 
+                            '\n' || dS->string[i+2] == '\r')) {
+                        printf("%s\n", dS->string);
+                        for (j = 0, k = 0; j < length; j++) {
+                            if (j == i) {
+                                continue;
+                            }
+                            else {
+                                newString[k] = dS->string[j];
+                                printf("%c", newString[k]);
+                                k++;
+                            }                        
+                        }
+                        printf("\n*: %s\n", newString);
+                        dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
+                        printf("segfault\n");
+                        strcpy(dS->string, newString);
+                        processStrings(header);
+                    }
+
                     // If there are 2 left, remove last one for <p> tag
-                    if (dS->string[i+1] != '\r' && dS->string[i+1] != '\n') { 
-                        printf("here 2\n");
+                    else if ((dS->string[i+1] == '\n' || dS->string[i+1] == '\r') && (dS->string[i+2] 
+                            != '\r' || dS->string[i+2] != '\r')) { 
                         for (j = 0, k = 0; j < length; j++) {
                             if (j == i) {
                                 newString[k] = '<';
@@ -121,25 +143,7 @@ void processStrings(struct dataHeader *header)
                         strcpy(dS->string, newString);
                     }
 
-                    // Removes multiple newlines and carriage returns
-                    else {
-                        printf("here 3\n");
-                        printf("%s\n", dS->string);
-                        for (j = 0, k = 0; j < length; j++) {
-                            if (j == i) {
-                                continue;
-                            }
-                            else {
-                                newString[k] = dS->string[j];
-                                k++;
-                            }                        
-                        }
-                        printf("\n*: %s\n", newString);
-                        dS->string = realloc(dS->string, sizeof(char) * strlen(newString));
-                        printf("segfault\n");
-                        strcpy(dS->string, newString);
-                        processStrings(header);
-                    }
+                    
                 }
 
                 /*
@@ -147,7 +151,6 @@ void processStrings(struct dataHeader *header)
                  */
                 else if ((dS->string[i+1] != '\r' && dS->string[i+1] != '\n') && (dS->string[i-1] != '\n'
                         && dS->string[i-1] != '\r')) {
-                    printf("here 4\n");
                     // malloc more space for the html tag
                     for (j = 0, k = 0; j < length; j++) {
                         if (j == i) {
