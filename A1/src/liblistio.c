@@ -14,6 +14,7 @@ struct dataHeader * buildHeader()
 {
     struct dataHeader *head = (struct dataHeader *) malloc(sizeof(struct dataHeader));
 
+    /* Creates the memory for the header node*/
     if (head != NULL) {
         head->name = NULL;
         head->length = 0;
@@ -44,17 +45,18 @@ void addString(struct dataHeader *header, char *str)
     struct dataString *dS = (struct dataString *) malloc(sizeof(struct dataString));
     struct dataString *current = header->next;
 
+    /* Creates a new node to be placed into the list */
     dS->string = (char *) malloc(sizeof(char) * strlen(str));
     strcpy(dS->string, str);
 
-    // First string
+    /* First string in the list */
     if (header->next == NULL) {
         header->next = dS;
         dS->next = NULL;
         return;
     }
         
-    // If not first string
+    /* Used once the list has been created */
     while (current->next != NULL) {
         current = current->next;
     }
@@ -64,13 +66,13 @@ void addString(struct dataHeader *header, char *str)
 
 void printString(struct dataHeader *header)
 {
-    struct dataString *dS = header->next;
-
+    struct dataString *current = header->next;
+  
     printf("%s\n", getName(header));
 
-    while (dS != NULL) {
-        printf("%s\n", dS->string);
-        dS = dS->next;
+    while (current != NULL) {
+        printf("%s\n", current->string);
+        current = current->next;
     }
 }
 
@@ -83,20 +85,22 @@ void processStrings(struct dataHeader *header)
     while (dS != NULL) {
         length = strlen(dS->string);
         for (i = 0; i < length; i++) {
-            // Removes extra spaces and tabs
+            /* Removes extra spaces and tabs */
             if ((dS->string[i] == ' ' && dS->string[i+1] == ' ') || (dS->string[i] == '\t'
                     && dS->string[i+1] == '\t')) {
                 newString = spaceAdjust(dS->string, i);
                 dS->string = (char *) malloc(sizeof(char) * strlen(newString));
                 strcpy(dS->string, newString);
+                /* Resets string until fully processed */
                 length = strlen(dS->string);
                 i = 0;
             }
-            // Removes extra newline and carriage returns. Replaces with HTML tags
+            /* Removes extra newline and carriage returns. Replaces with HTML tags */
             else if (dS->string[i] == '\n' || dS->string[i] == '\r') {
                 newString = newLineAdjust(dS->string, i);
                 dS->string = (char *) malloc(sizeof(char) * strlen(newString));
                 strcpy(dS->string, newString);
+                /* Resets string until fully processed */
                 length = strlen(dS->string);
                 i = 0;
             }
@@ -114,9 +118,11 @@ char * spaceAdjust(char * string, int index)
 
     for (i = 0, j = 0; i < length; i++) {
         if (i == index) {
+            /* Skips of extra tab or space */
             continue;
         }
         else {
+            /* Copies string into a new string without extra spaces or tabs */
             newString[j] = string[i];
             j++;
         }
@@ -132,13 +138,14 @@ char * newLineAdjust(char * string, int index)
 
     length = strlen(string);
 
-    // <BR> tag
+    /* For single newlines and carriage returns, replace with the <BR> tag */
     if (string[index+1] != '\n' && string[index+1] != '\r') {
 
         newString = (char *) malloc(sizeof(char) * strlen(string) + 3);
 
         for (i = 0, j = 0; i < length; i++) {
             if (i == index) {
+                /* Replacing characters */
                 newString[j] = '<';
                 newString[j+1] = 'B';
                 newString[j+2] = 'R';
@@ -152,14 +159,15 @@ char * newLineAdjust(char * string, int index)
         }
     }
 
-    // <P> tag
+    /* For multiple newlines and carriage returns, replace with the <P> tag */
     else if (string[index+1] == '\n' || string[index+1] == '\r') {
-        // If multiple New Lines or Carriage returns
+        /* Removes excess newlines or Carriage returns */
         if (string[index+2] == '\n' || string[index+2] == '\r') {
             newString = (char *) malloc(sizeof(char) * strlen(string) - 1);
 
             for (i = 0, j = 0; i < length; i++) {
                 if (i == index) {
+                    /* Skips extra newlines and carriage returns */
                     continue;
                 }
                 else {
@@ -168,12 +176,13 @@ char * newLineAdjust(char * string, int index)
                 }
             }
         }
-        // Replace with HTML tag
+        /* If there are two newlines or carriage returns, replace with <P> tags */
         else {
             newString = (char *) malloc(sizeof(char) * strlen(string) + 2);
 
             for (i = 0, j = 0; i < length; i++) {
                 if (i == index) {
+                    /* Replacing characters */
                     newString[j] = '<';
                     newString[j+1] = 'P';
                     newString[j+2] = '>';
@@ -188,28 +197,55 @@ char * newLineAdjust(char * string, int index)
         }
     }
 
-    printf(">%s\n", newString);
-
     return (newString);
 }
 
 void freeStructure(struct dataHeader *header)
 {
-    /* Change to free from back!!*/
+    struct dataString *dsHead = header->next;
+    struct dataString *current, *next;
 
-    struct dataString * current = header->next;
-    struct dataString * next;
+    /* If there is no data, returns from function */
+    if (header == NULL) {
+        return;
+    }
 
-    while(current != NULL){
+    /* Reverses the list to be freed backwards */
+    header->next = NULL;
+    current = reverseList(dsHead);
+
+    /* Free from tail to head */
+    while (current != NULL) {
         next = current->next;
         free(current->string);
         free(current);
         current = next;
     }
+
+    /* Frees header from list */
     free(header->name);
     header->length = 0;
     free(header);
     header = NULL;
+}
+
+struct dataString * reverseList(struct dataString *dsHead)
+{
+    struct dataString *current, *prev, *next;
+    current = dsHead;
+    prev = NULL;
+
+    /* Reverses the list */
+    while(current != NULL){
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    dsHead = prev;
+
+    /* Returns reversed list */
+    return (dsHead);
 }
 
 void writeStrings(char *filename, struct dataHeader *header)
@@ -218,7 +254,7 @@ void writeStrings(char *filename, struct dataHeader *header)
     FILE *fp;
     int nameLength, strLength, totalLength;
 
-    // Calculate the length
+    /* Calculate the length of all strings */
     while (dS != NULL) {
         totalLength = (strlen(dS->string) + 1) + totalLength;
         dS = dS->next;
@@ -227,18 +263,18 @@ void writeStrings(char *filename, struct dataHeader *header)
 
     fp = fopen(filename, "wb");
 
+    /* Writes the header to the binary file */
     nameLength = strlen(header->name) + 1;
     fwrite(&nameLength, sizeof(int), 1, fp);
     fwrite(header->name, sizeof(char), nameLength, fp);
     fwrite(&header->length, sizeof(int), 1, fp);
-    printf("%d\n%s\n%d\n", nameLength, header->name, header->length);
     dS = header->next;
 
+    /* Writes the rest of the nodes to the binary file */
     while (dS != NULL) {
         strLength = strlen(dS->string) + 1;
         fwrite(&strLength, sizeof(int), 1, fp);
         fwrite(dS->string, sizeof(char), strLength, fp);
-        printf("%d\n%s\n", strLength, dS->string);
         dS = dS->next;
     }
     fclose(fp);
@@ -255,12 +291,14 @@ struct dataHeader *readStrings(char *filename)
 
     fp = fopen(filename, "rb");
 
+    /* Occupies the header information */
     fread(&tempBuff, sizeof(int), 1, fp);
     buffer = malloc(sizeof(char) * tempBuff);
     fread(buffer, sizeof(char), tempBuff, fp);
     setName(header, buffer);
     fread(&header->length, sizeof(int), 1, fp);
 
+    /* Occupies the dataString information in until EOF */
     while (!feof(fp)) {
         if (skip != 0) {
             buffer = malloc(sizeof(char) * tempBuff);
@@ -276,5 +314,6 @@ struct dataHeader *readStrings(char *filename)
 
     fclose(fp);
 
+    /* Returns an occupied list */
     return(header);
 }

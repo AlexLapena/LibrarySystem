@@ -67,19 +67,24 @@ void printString(struct dataHeader *header);
 void processStrings(struct dataHeader *header);
 
 /*
- * Associated with process strings
+ * Associated with process strings -- Processes extra tabs and spaces
  */
 char * spaceAdjust(char * string, int index);
 
 /*
- * Associated with process strings
+ * Associated with process strings -- Processes newlines and carriage returns
  */
 char * newLineAdjust(char * string, int index);
 
 /* 
  * Free() all of the dataString structures and the dataHeader structure.
-*/
+ */
 void freeStructure(struct dataHeader *header);
+
+/* 
+ * Reverses the list from tail to head.
+ */
+struct dataString * reverseList(struct dataString *dsHead);
 
 /*
  * File I/O
