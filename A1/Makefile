@@ -2,7 +2,7 @@ CC = gcc
 
 all: liblistio.a
 
-# Runs main program
+# Creates Library
 liblistio.a: src/listio.c
 	$(CC) src/listio.c -o src/listio.o -c
 	ar cr liblistio.a src/listio.o
