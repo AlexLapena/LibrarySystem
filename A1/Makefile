@@ -1,10 +1,15 @@
 CC = gcc
 
-all: ds
+all: liblistio.a
 
 # Runs main program
-ds: main.c src/liblistio.c
-	$(CC) main.c src/liblistio.c
+liblistio.a: src/listio.c
+	$(CC) src/listio.c -o src/listio.o -c
+	ar cr liblistio.a src/listio.o
+
+# Runs test program
+run: main.c
+	$(CC) main.c -llistio -L. -o run
 
 clean:
-	rm -rf *.o ds a.out test.bin
+	rm -rf *.o run *.bin liblistio.a

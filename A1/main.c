@@ -17,6 +17,8 @@ int main(int argc, char **argv)
     struct dataString *dS;
     char *nameReturn;
 
+
+    /* Works as expected */
     dH = buildHeader();
     printf(" - Header Built\n");
     setName(dH, "Header Name");
@@ -31,6 +33,7 @@ int main(int argc, char **argv)
     addString(dH, "More\n Test    Strings hello :D:D:D:D");
     addString(dH, "tab\t\ttest");
     addString(dH, "\r\r");
+    addString(dH, "");
     printf(" - Strings added\n");
     printString(dH);
     printf(" - Strings Processed\n");
@@ -43,6 +46,15 @@ int main(int argc, char **argv)
     printf("\n** String reading **\n\n");
     printString(read);
     freeStructure(read);
+
+    /* Try to break program */
+    printf("\n\n*BREAK PROGRAM*\n\n");
+
+    // No header
+    setName(dH, "Header Name");
+    processStrings(dH);
+    freeStructure(read);
+    addString(dH, "No header\n");
 
     return(0); 
 } 
